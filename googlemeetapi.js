@@ -21,12 +21,19 @@ class API {
     load() {
         var time = window.performance.now();
         var getSubmitButtonEnabled = function () {
-            return document.querySelector("#ow3 > div.T4LgNb > div > div:nth-child(9) > div.crqnQb > div.mKBhCf.qwU8Me.RlceJe.kjZr4 > div > div.Bx7THd.PBWx0c.Uy7Qke.XN1AMe > div.ZHdB2e.iy732 >         div.fe4pJf.Pdo15c > span.HALYaf.u92yl.KKjvXb > div > div.BC4V9b > div.uArJ5e.Y5FYJe.cjq2Db.IOMpW.Cs0vCd.M9Bg4d");
+             return $("#ow3 > div.T4LgNb > div > div:nth-child(9) > div.crqnQb > div.mKBhCf.qwU8Me.RlceJe.kjZr4 > div > div.Bx7THd.PBWx0c.Uy7Qke.XN1AMe > div.ZHdB2e.iy732 > div.fe4pJf.Pdo15c > span.HALYaf.u92yl.KKjvXb > div > div.BC4V9b").children[1]
         };
         var inputForm = document.getElementsByName("chatTextInput")[0];
+        /**
+         * 
+         * @param {String} what the message to be sent.
+         * Watch out! Don't use this too often. 
+         */
         var sendMessage = function (what) {
+
+
             var getSubmitButtonEnabledInside = function () {
-                return document.querySelector("#ow3 > div.T4LgNb > div > div:nth-child(9) > div.crqnQb > div.mKBhCf.qwU8Me.RlceJe.kjZr4 > div > div.Bx7THd.PBWx0c.Uy7Qke.XN1AMe > div.ZHdB2e.iy732 >         div.fe4pJf.Pdo15c > span.HALYaf.u92yl.KKjvXb > div > div.BC4V9b > div.uArJ5e.Y5FYJe.cjq2Db.IOMpW.Cs0vCd.M9Bg4d");
+                return $("#ow3 > div.T4LgNb > div > div:nth-child(9) > div.crqnQb > div.mKBhCf.qwU8Me.RlceJe.kjZr4 > div > div.Bx7THd.PBWx0c.Uy7Qke.XN1AMe > div.ZHdB2e.iy732 > div.fe4pJf.Pdo15c > span.HALYaf.u92yl.KKjvXb > div > div.BC4V9b").children[1];
             }
             inputForm.focus();
             inputForm.select()
@@ -37,8 +44,7 @@ class API {
             element.dispatchEvent(evt);
             console.log(getSubmitButtonEnabledInside());
             getSubmitButtonEnabledInside().click();
-
-
+            getSubmitButtonEnabledInside().click();
         };
 
         /**
@@ -64,7 +70,9 @@ class API {
         var className = "GDhqjd";
 
         console.log("message listener set up init!");
-        var interval = setInterval(async () => {
+        var interval = setInterval(() => {
+            
+
 
             let prev = this.messageArray;
             let prevElement = this.messageArray[this.messageArray.length - 1];
@@ -79,12 +87,21 @@ class API {
             let latest = list[list.length - 1]; // this isn't the message, but the message div, that contains data.
             let messageContent = "";
             let elementSender = latest.dataset.senderName;
+            
+            if (senderName === "You")
+                return; // you aren't egotistical, you don't care about your own messages.
+
             let elementMessagesSize = latest.children[1].childElementCount;
 
             if (latest == prevElement) {
-                
-              return;
-           }
+                // google meet does this weeird thing where it chops messages together, so lets fix that stuff
+                if (this.getMessageContentFromHTMLElement(latest) != this.getMessageContentFromHTMLElement(prevElement)) {
+                    this.latestMessage.value = this.getMessageContentFromHTMLElement(latest);
+                    this.listeners.forEach(func => func(this.latestMessage.name, this.latestMessage.value));
+                }
+
+                return;
+            }
             this.messageArray.push(latest);
 
             for (let i = 0; i < elementMessagesSize; i++) { // loop through each text element and add it to the array
@@ -95,10 +112,19 @@ class API {
             this.latestMessage.value = messageContent;
 
             this.listeners.forEach(func => func(this.latestMessage.name, this.latestMessage.value));
+            
         }, 20);
         window["interval"] = interval;
         console.log("Message Listener Successfully setup!");
         return interval;
+    }
+    getMessageContentFromHTMLElement = function (element) {
+        let elementMessagesSize = element.children[1].childElementCount;
+        let messageContent = "";
+        for (let i = 0; i < elementMessagesSize; i++) { // loop through each text element and add it to the array
+            messageContent += (latest.children[1].children[i].dataset.messageText + "\n");
+        };
+        return messageContent;
     }
 
 }
